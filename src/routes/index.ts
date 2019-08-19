@@ -76,6 +76,40 @@ export async function makeDonation(req: Request, res: Response) {
     result,
   });
 }
+export async function randomDonation(req: Request, res: Response) {
+  const bodySchema = Joi.object({
+    authenticate: Joi.string().required(),
+    categories: Joi.string().required(),
+    amount: Joi.number().min(4).required(),
+    comment: Joi.string().optional().default(""),
+    isAnonymous: Joi.boolean().optional().default(true),
+  });
+
+  const isValid = await bodySchema.validate(req.body);
+  if (!isValid) {
+    return sendResponse(req, res, { success: false, error: "INVALID_REQUEST", detail: isValid });
+  }
+
+  const { categories, amount, comment, isAnonymous } = req.body;
+
+  const categoriesNumber: number[] = categories.split(",").map((categorie: any) =>
+    KitaBisa.categories[categorie.toUpperCase()]);
+  const campaigns = await req.kitaBisa.getCampaign(categoriesNumber);
+  const campaign = campaigns[Math.floor(Math.random() * campaigns.length)];
+
+  const result = await req.kitaBisa.makeDonation({
+    url: campaign.url,
+    amount,
+    comment: (!comment) ? "" : comment,
+    isAnonymous: (!isAnonymous) ? true : false,
+    evidence: false,
+  });
+
+  return sendResponse(req, res, {
+    success: true,
+    result,
+  });
+}
 
 async function sendResponse(req: Request, res: Response, response: any) {
   res.json(response);

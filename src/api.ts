@@ -16,6 +16,7 @@ app.post("/api/login", routes.setCredential, routes.userAuthentication);
 app.post("/api/balance", routes.setCredential, routes.getBalance);
 app.post("/api/campaigns", routes.setCredential, routes.getCampaigns);
 app.post("/api/donation", routes.setCredential, routes.makeDonation);
+app.post("/api/random", routes.setCredential, routes.randomDonation);
 
 app.listen(PORT, () =>
   console.log(`Server is running http://localhost:${PORT}...`),
